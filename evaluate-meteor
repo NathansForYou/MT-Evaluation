@@ -3,7 +3,11 @@ import argparse # optparse is deprecated
 from itertools import islice # slicing for iterators
  
 def word_matches(h, ref):
-    return sum(1 for w in h if w in ref)
+    return float(sum(1 for w in h if w in ref))
+
+def word_count(h):
+    return float(sum(1 for w in h))
+
  
 def main():
     parser = argparse.ArgumentParser(description='Evaluate translation hypotheses.')
@@ -21,13 +25,36 @@ def main():
                 yield [sentence.strip().split() for sentence in pair.split(' ||| ')]
  
     # note: the -n option does not work in the original code
+    alpha = 0.82
+    #print "Is this working?"
     for h1, h2, ref in islice(sentences(), opts.num_sentences):
         rset = set(ref)
         h1_match = word_matches(h1, rset)
         h2_match = word_matches(h2, rset)
-        print(1 if h1_match > h2_match else # \begin{cases}
-                (0 if h1_match == h2_match
-                    else -1)) # \end{cases}
+        reference_total = word_count(ref)
+        h1_total = word_count(h1)
+        h2_total = word_count(h2)
+
+        h1_recall = h1_match / h1_total
+        h2_recall = h2_match / h2_total
+        #print "h1 recall: " + str(h1_recall)
+        h1_precision = h1_match / reference_total
+        #print "h1 precision: " + str(h1_precision)
+        h2_precision = h2_match / reference_total
+
+        if h1_recall == 0 and h1_precision == 0:
+            h1_l = 0
+        else:
+            h1_l = (h1_precision * h1_recall) / ((1.0 - alpha) * h1_recall + alpha * h1_precision)
+        #print "h_1 val: " + str(h1_l)
+
+        if h2_recall == 0 and h2_precision == 0:
+            h1_2 = 0
+        else:
+            h2_l = (h2_precision * h2_recall) / ((1.0 - alpha) * h2_recall + alpha * h2_precision)
+        #print "h_2 val: " + str(h2_l)
+ 
+        print(1 if h1_l > h2_l else (0 if h1_l == h2_l else -1)) # \end{cases}
  
 # convention to allow import of this file as a module
 if __name__ == '__main__':
