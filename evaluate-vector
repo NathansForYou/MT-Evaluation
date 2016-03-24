@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import argparse # optparse is deprecated
 import numpy as np
+import VectorMap.py as vm
 from itertools import islice # slicing for iterators
  
  # unneeded, replace with cosign similarity calculations
@@ -37,9 +38,11 @@ def main():
  
     # note: the -n option does not work in the original code
     for h1, h2, ref in islice(sentences(), opts.num_sentences):
-        rset = set(ref)
-        h1_match = word_matches(h1, rset)
-        h2_match = word_matches(h2, rset)
+        v_ref = vm.sentence_to_vector(ref)
+        v_h1 = vm.sentence_to_vector(h1)
+        v_h2 = vm.sentence_to_vector(h2)
+        h1_match = sentence_similarity(v_h1, v_ref)
+        h2_match = sentence_similarity(v_h2, v_ref)
         # 1 if distance between h1 and ref is less than h2 and ref
         print(1 if h1_match > h2_match else # \begin{cases}
                 (0 if h1_match == h2_match
