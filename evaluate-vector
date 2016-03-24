@@ -14,6 +14,11 @@ def sentence_similarity(sent_vec, ref_vec):
     similarity = dot_product / (mag_sent * mag_ref)
     return similarity
 
+def preprocess(line):
+    line = line.lower()
+    exclude = set(string.punctuation)
+    line = ''.join(ch if ch not in exclude else ' ' for ch in line)
+    return line
  
 def main():
     parser = argparse.ArgumentParser(description='Evaluate translation hypotheses.')
@@ -28,7 +33,7 @@ def main():
     def sentences():
         with open(opts.input) as f:
             for pair in f:
-                yield [sentence.strip().split() for sentence in pair.split(' ||| ')]
+                yield [preprocess(sentence) for sentence in pair.split(' ||| ')]
  
     # note: the -n option does not work in the original code
     for h1, h2, ref in islice(sentences(), opts.num_sentences):
