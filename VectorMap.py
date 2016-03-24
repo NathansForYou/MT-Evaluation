@@ -19,4 +19,4 @@ class VectorMap:
         if word in self.vectors:
             return self.vectors[word]
         else:
-            return [0.0] * self.dim
+            return self.vectors["OOL"]
