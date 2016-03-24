@@ -20,3 +20,12 @@ class VectorMap:
             return self.vectors[word]
         else:
             return self.vectors["OOL"]
+
+    def sentence_to_vector(self, line):
+        words = line.split()
+        sen_vec = [0.0] * self.dim
+
+        for word in words:
+            sen_vec = [sum(z) for z in zip(sen_vec, self.get_vector(word))]
+
+        return sen_vec
