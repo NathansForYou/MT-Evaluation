@@ -1,7 +1,7 @@
-#!/usr/bin/env python
+#!/usr/bin/pypy
 import sys
 import argparse # optparse is deprecated
-import numpy as np
+#import numpy as np
 from VectorMap import VectorMap
 import string
 from itertools import islice # slicing for iterators
@@ -16,6 +16,7 @@ def euclidean_dist(sent_vec, ref_vec):
     return (sum((x[0] - x[1]) ** 2 for x in zip(sent_vec, ref_vec))) ** 0.5
 
 def cosine_sim(sent_vec, ref_vec):
+    '''
     dot_product = np.dot(sent_vec, ref_vec)
     mag_sent = np.linalg.norm(sent_vec)
     #print "Sentence Vector: " + str(mag_sent)
@@ -24,6 +25,11 @@ def cosine_sim(sent_vec, ref_vec):
     similarity = dot_product / (mag_sent * mag_ref)
     #print "Similarity: " + str(similarity)
     return similarity
+    '''
+    dot_product = sum(x[0] * x[1] for x in zip(sent_vec, ref_vec))
+    mag_sent = (sum(x ** 2 for x in sent_vec)) ** 0.5
+    mag_ref = (sum(x ** 2 for x in ref_vec)) ** 0.5
+    return dot_product / (mag_sent * mag_ref)
 
 def prerec(h, e, vm):
     score = 0.0
@@ -36,9 +42,9 @@ def prerec(h, e, vm):
                 sim = new_sim
                 most_sim = rword
         score += sim
-    if len(e.split()) == 0:
+    if len(h.split()) == 0:
         return 1.0
-    return score / len(e.split())
+    return score / len(h.split())
 
 def preprocess(line):
     line = line.lower()
@@ -64,14 +70,11 @@ def main():
                 yield [preprocess(sentence) for sentence in pair.split(' ||| ')]
 # note: the -n option does not work in the original code
     alpha = 0.82
-    i = 0
     for h1, h2, ref in islice(sentences(), opts.num_sentences):
-        i += 1
-        sys.stderr.write(str(i) + "\n")
-        h1_recall = prerec(h1, ref, vm)
-        h2_recall = prerec(h2, ref, vm)
-        h1_precision = prerec(ref, h1, vm)
-        h2_precision = prerec(ref, h2, vm)
+        h1_precision = prerec(h1, ref, vm)
+        h2_precision = prerec(h2, ref, vm)
+        h1_recall = prerec(ref, h1, vm)
+        h2_recall = prerec(ref, h2, vm)
 
         if h1_recall == 0 and h1_precision == 0:
             h1_l = 0
