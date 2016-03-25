@@ -14,11 +14,11 @@ def word_matches(h, ref):
 def sentence_similarity(sent_vec, ref_vec):
     dot_product = np.dot(sent_vec, ref_vec)
     mag_sent = np.linalg.norm(sent_vec)
-    print "Sentence Vector: " + str(mag_sent)
+    #print "Sentence Vector: " + str(mag_sent)
     mag_ref = np.linalg.norm(ref_vec)
-    print "Reference Vector: " + str(mag_ref)
+    #print "Reference Vector: " + str(mag_ref)
     similarity = dot_product / (mag_sent * mag_ref)
-    print "Similarity: " + str(similarity)
+    #print "Similarity: " + str(similarity)
     return similarity
 
 def preprocess(line):
@@ -51,8 +51,8 @@ def main():
         v_h2 = vm.sentence_to_vector(h2)
         h1_match = sentence_similarity(v_h1, v_ref)
         h2_match = sentence_similarity(v_h2, v_ref)
-        # 1 if distance between h1 and ref is less than h2 and ref
-        print(1 if h1_match < h2_match else # \begin{cases}
+        # 1 if sim between h1 and ref is greater than h2 and ref
+        print(1 if h1_match > h2_match else # \begin{cases}
                 (0 if h1_match == h2_match
                     else -1)) # \end{cases}
         #bar.update(i+1)
