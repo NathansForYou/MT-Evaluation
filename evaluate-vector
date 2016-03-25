@@ -48,7 +48,25 @@ def main():
                 yield [preprocess(sentence) for sentence in pair.split(' ||| ')]
 # note: the -n option does not work in the original code
     #i = 0
+    alpha = 0.82
     for h1, h2, ref in islice(sentences(), opts.num_sentences):
+        h1_recall = vm.prerec(h1, ref, vm)
+        h2_recall = vm.prerec(h2, ref, vm)
+        h1_precision = vm.prerec(ref, h1, vm)
+        h2_precision = vm.prerec(ref, h2, vm)
+
+        if h1_recall == 0 and h1_precision == 0:
+            h1_l = 0
+        else:
+            h1_l = (h1_precision * h1_recall) / ((1.0 - alpha) * h1_recall + alpha * h1_precision)
+
+        if h2_recall == 0 and h2_precision == 0:
+            h1_2 = 0
+        else:
+            h2_l = (h2_precision * h2_recall) / ((1.0 - alpha) * h2_recall + alpha * h2_precision)
+
+        print(1 if h1_l > h2_l else (0 if h1_l == h2_l else -1))
+        '''
         v_ref = vm.sentence_to_vector(ref)
         v_h1 = vm.sentence_to_vector(h1)
         v_h2 = vm.sentence_to_vector(h2)
@@ -62,6 +80,7 @@ def main():
         #i += 1
         #sleep(0.1)
     #bar.finish()
+    '''
  
 # convention to allow import of this file as a module
 if __name__ == '__main__':
