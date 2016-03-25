@@ -14,7 +14,7 @@ def word_matches(h, ref):
 def euclidean_dist(sent_vec, ref_vec):
     return (sum((x[0] - x[1]) ** 2 for x in zip(sent_vec, ref_vec))) ** 0.5
 
-def sentence_similarity(sent_vec, ref_vec):
+def cosine_sim(sent_vec, ref_vec):
     dot_product = np.dot(sent_vec, ref_vec)
     mag_sent = np.linalg.norm(sent_vec)
     #print "Sentence Vector: " + str(mag_sent)
@@ -23,6 +23,19 @@ def sentence_similarity(sent_vec, ref_vec):
     similarity = dot_product / (mag_sent * mag_ref)
     #print "Similarity: " + str(similarity)
     return similarity
+
+def prerec(h, e, vm):
+    score = 0
+    for hword in h.split():
+        most_sim = ""
+        sim = float("-inf")
+        for rword in e.split():
+            new_sim = cosine_sim(vm.get_vector(hword), vm.get_vector(rword))
+            if new_sim > sim:
+                sim = new_sim
+                most_sim = rword
+        score += most_sim
+    return score / len(e.split())
 
 def preprocess(line):
     line = line.lower()
@@ -52,8 +65,8 @@ def main():
         v_ref = vm.sentence_to_vector(ref)
         v_h1 = vm.sentence_to_vector(h1)
         v_h2 = vm.sentence_to_vector(h2)
-        h1_match = sentence_similarity(v_h1, v_ref)
-        h2_match = sentence_similarity(v_h2, v_ref)
+        h1_match = cosine_sim(v_h1, v_ref)
+        h2_match = cosine_sim(v_h2, v_ref)
         # 1 if sim between h1 and ref is greater than h2 and ref
         print(1 if h1_match > h2_match else # \begin{cases}
                 (0 if h1_match == h2_match
