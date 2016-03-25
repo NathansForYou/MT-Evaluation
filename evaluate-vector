@@ -53,7 +53,7 @@ def main():
         h2_match = sentence_similarity(v_h2, v_ref)
         # 1 if sim between h1 and ref is greater than h2 and ref
         print(1 if h1_match > h2_match else # \begin{cases}
-                (0 if h1_match == h2_match
+                (0 if abs(h1_match - h2_match) < 0.0001
                     else -1)) # \end{cases}
         #bar.update(i+1)
         #i += 1

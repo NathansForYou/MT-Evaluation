@@ -4,6 +4,16 @@ class VectorMap:
     def __init__(self):
         self.vectors = {}
         self.dim = 0
+        self.stopwords = self.load_stopwords()
+
+    def load_stopwords(self):
+        stopwords = set()
+        f = open("stopwords")
+        for line in f:
+            for word in line.split("\'"):
+                word = word.strip()
+                stopwords.add(word)
+        return stopwords
 
     def load_from_file(self, file_name):
         f = open(file_name)
@@ -26,6 +36,7 @@ class VectorMap:
         sen_vec = [0.0] * self.dim
 
         for word in words:
-            sen_vec = [sum(z) for z in zip(sen_vec, self.get_vector(word))]
+            if word not in self.stopwords:
+                sen_vec = [sum(z) for z in zip(sen_vec, self.get_vector(word))]
 
         return sen_vec
