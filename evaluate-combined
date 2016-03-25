@@ -60,9 +60,9 @@ def prerec(h, e, vm):
         if " ".join((harr[i], harr[i + 1], harr[i + 2], harr[i + 3])) in e4words:
             score += 1
 
-    if len(e.split()) == 0:
+    if (4 * len(harr) - 6) == 0:
         return 1.0
-    return score / (len(harr) * 4 - 6)
+    return score / (4 * len(harr) - 6)
 
 def preprocess(line):
     line = line.lower()
@@ -114,7 +114,7 @@ def main():
         h2_match *= h2_l
         # 1 if sim between h1 and ref is greater than h2 and ref
         print(1 if h1_match > h2_match else # \begin{cases}
-                (0 if abs(h1_match - h2_match) < 0.001
+                (0 if h1_match == h2_match
                     else -1)) # \end{cases}
         #bar.update(i+1)
         #i += 1
