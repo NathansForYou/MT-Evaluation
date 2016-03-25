@@ -27,18 +27,42 @@ def cosine_sim(sent_vec, ref_vec):
 
 def prerec(h, e, vm):
     score = 0.0
+    earr = e.split()
+    harr = h.split()
+
+    # unigram
+    ewords = set(earr)
     for hword in h.split():
-        most_sim = ""
-        sim = float("-inf")
-        for rword in e.split():
-            new_sim = cosine_sim(vm.get_vector(hword), vm.get_vector(rword))
-            if new_sim > sim:
-                sim = new_sim
-                most_sim = rword
-        score += sim
+        if hword in harr:
+            score += 1
+
+    # 2gram
+    e2words = set()
+    for i in range(0, len(earr) - 1):
+        e2words.add(" ".join((earr[i], earr[i + 1])))
+    for i in range(0, len(harr) - 1):
+        if " ".join((harr[i], harr[i + 1])) in e2words:
+            score += 1
+
+    # 3gram
+    e3words = set()
+    for i in range(0, len(earr) - 2):
+        e3words.add(" ".join((earr[i], earr[i + 1], earr[i + 2])))
+    for i in range(0, len(harr) - 2):
+        if " ".join((harr[i], harr[i + 1], harr[i + 2])) in e3words:
+            score += 1
+
+    # 4gram
+    e4words = set()
+    for i in range(0, len(earr) - 3):
+        e4words.add(" ".join((earr[i], earr[i + 1], earr[i + 2], earr[i + 3])))
+    for i in range(0, len(harr) - 3):
+        if " ".join((harr[i], harr[i + 1], harr[i + 2], harr[i + 3])) in e4words:
+            score += 1
+
     if len(e.split()) == 0:
         return 1.0
-    return score / len(e.split())
+    return score / (len(ewords) + len(e2words) + len(e3words) + len(e4words))
 
 def preprocess(line):
     line = line.lower()
@@ -83,13 +107,14 @@ def main():
         else:
             h2_l = (h2_precision * h2_recall) / ((1.0 - alpha) * h2_recall + alpha * h2_precision)
 
-        print(1 if h1_l > h2_l else (0 if h1_l == h2_l else -1))
-        '''
         v_ref = vm.sentence_to_vector(ref)
         v_h1 = vm.sentence_to_vector(h1)
         v_h2 = vm.sentence_to_vector(h2)
         h1_match = cosine_sim(v_h1, v_ref)
         h2_match = cosine_sim(v_h2, v_ref)
+
+        h1_match *= h1_l
+        h2_match *= h2_l
         # 1 if sim between h1 and ref is greater than h2 and ref
         print(1 if h1_match > h2_match else # \begin{cases}
                 (0 if h1_match == h2_match
@@ -98,7 +123,6 @@ def main():
         #i += 1
         #sleep(0.1)
     #bar.finish()
-    '''
  
 # convention to allow import of this file as a module
 if __name__ == '__main__':
