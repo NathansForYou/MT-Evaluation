@@ -32,8 +32,8 @@ def prerec(h, e, vm):
 
     # unigram
     ewords = set(earr)
-    for hword in h.split():
-        if hword in harr:
+    for hword in harr:
+        if hword in earr:
             score += 1
 
     # 2gram
@@ -60,9 +60,9 @@ def prerec(h, e, vm):
         if " ".join((harr[i], harr[i + 1], harr[i + 2], harr[i + 3])) in e4words:
             score += 1
 
-    if len(e.split()) == 0:
+    if (4 * len(harr) - 6) == 0:
         return 1.0
-    return score / (len(ewords) + len(e2words) + len(e3words) + len(e4words))
+    return score / (4 * len(harr) - 6)
 
 def preprocess(line):
     line = line.lower()
@@ -88,14 +88,11 @@ def main():
                 yield [preprocess(sentence) for sentence in pair.split(' ||| ')]
 # note: the -n option does not work in the original code
     alpha = 0.82
-    i = 0
     for h1, h2, ref in islice(sentences(), opts.num_sentences):
-        i += 1
-        sys.stderr.write(str(i) + "\n")
-        h1_recall = prerec(h1, ref, vm)
-        h2_recall = prerec(h2, ref, vm)
-        h1_precision = prerec(ref, h1, vm)
-        h2_precision = prerec(ref, h2, vm)
+        h1_precision = prerec(h1, ref, vm)
+        h2_precision = prerec(h2, ref, vm)
+        h1_recall = prerec(ref, h1, vm)
+        h2_recall = prerec(ref, h2, vm)
 
         if h1_recall == 0 and h1_precision == 0:
             h1_l = 0
