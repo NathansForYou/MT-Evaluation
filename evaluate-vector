@@ -11,6 +11,9 @@ from time import sleep
 def word_matches(h, ref):
     return sum(1 for w in h if w in ref)
 
+def euclidean_dist(sent_vec, ref_vec):
+    return (sum((x[0] - x[1]) ** 2 for x in zip(sent_vec, ref_vec))) ** 0.5
+
 def sentence_similarity(sent_vec, ref_vec):
     dot_product = np.dot(sent_vec, ref_vec)
     mag_sent = np.linalg.norm(sent_vec)
@@ -53,7 +56,7 @@ def main():
         h2_match = sentence_similarity(v_h2, v_ref)
         # 1 if sim between h1 and ref is greater than h2 and ref
         print(1 if h1_match > h2_match else # \begin{cases}
-                (0 if abs(h1_match - h2_match) < 0.0001
+                (0 if h1_match == h2_match
                     else -1)) # \end{cases}
         #bar.update(i+1)
         #i += 1

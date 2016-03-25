@@ -4,7 +4,7 @@ class VectorMap:
     def __init__(self):
         self.vectors = {}
         self.dim = 0
-        self.stopwords = self.load_stopwords()
+        #self.stopwords = self.load_stopwords()
 
     def load_stopwords(self):
         stopwords = set()
@@ -36,7 +36,6 @@ class VectorMap:
         sen_vec = [0.0] * self.dim
 
         for word in words:
-            if word not in self.stopwords:
-                sen_vec = [sum(z) for z in zip(sen_vec, self.get_vector(word))]
+            sen_vec = [sum(z) for z in zip(sen_vec, self.get_vector(word))]
 
         return sen_vec
